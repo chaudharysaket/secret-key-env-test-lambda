@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  secret-key-env-test-lambda
+
+  Sample SAM Template for secret-key-env-test-lambda
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Parameters:
+  NRAccountId:
+    Type: String
+    Description: Your New Relic account ID; necessary for distributed tracing.
+    AllowedPattern: '[0-9]+'
+  NRLiceseKey:
+    Type: String
+    Description: New Relic License Key
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: hello_world/
+      Handler: newrelic_lambda_wrapper.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          NEW_RELIC_LAMBDA_HANDLER: app.lambda_handler
+          NEW_RELIC_ACCOUNT_ID: !Sub ${NRAccountId}
+          NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
+          NEW_RELIC_EXTENSION_LOG_LEVEL: DEBUG
+          NEW_RELIC_LICENSE_KEY_SECRET: !Ref NRPersonalLicenseKeySecret
+          # NEW_RELIC_LOG_ENDPOINT: <endpoint>
+          # NEW_RELIC_TELEMETRY_ENDPOINT: <endpoint>
+
+      Layers:
+        - !Sub arn:aws:lambda:us-east-1:451483290750:layer:NewRelicPython39:77
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action: "secretsmanager:GetSecretValue"
+              Resource: !Ref NRPersonalLicenseKeySecret
+
+  NRPersonalLicenseKeySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: NRPersonalLicenseKeySecret
+      SecretString: !Sub |
+        {
+          "LicenseKey": "${NRLiceseKey}"
+        }
+
+Outputs:
+  SecretArn:
+    Description: "ARN of the LicenseKey secret"
+    Value: !Ref NRPersonalLicenseKeySecret
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
