@@ -34,7 +34,11 @@ Resources:
           NEW_RELIC_ACCOUNT_ID: !Sub ${NRAccountId}
           NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
           NEW_RELIC_EXTENSION_LOG_LEVEL: DEBUG
-          NEW_RELIC_LICENSE_KEY_SECRET: !Ref NRPersonalLicenseKeySecret
+          # To use personal Secrets manager, 
+          # if you want to use Secrets Manager ARN then !Ref NRPersonalLicenseKeySecret
+          # If you want to use Secrets Manager Name then hard code to the name used for creating the secret
+          # NEW_RELIC_LICENSE_KEY_SECRET: !Ref NRPersonalLicenseKeySecret
+          NEW_RELIC_LICENSE_KEY_SECRET: NRPersonalLicenseKeySecret # Name of the secret
           # NEW_RELIC_LOG_ENDPOINT: <endpoint>
           # NEW_RELIC_TELEMETRY_ENDPOINT: <endpoint>
 
