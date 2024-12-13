@@ -38,7 +38,7 @@ Resources:
           # if you want to use Secrets Manager ARN then !Ref NRPersonalLicenseKeySecret
           # If you want to use Secrets Manager Name then hard code to the name used for creating the secret
           # NEW_RELIC_LICENSE_KEY_SECRET: !Ref NRPersonalLicenseKeySecret
-          NEW_RELIC_LICENSE_KEY_SECRET: NRPersonalLicenseKeySecret # Name of the secret
+          # NEW_RELIC_LICENSE_KEY_SECRET: NRPersonalLicenseKeySecret # Name of the secret
           # NEW_RELIC_LOG_ENDPOINT: <endpoint>
           # NEW_RELIC_TELEMETRY_ENDPOINT: <endpoint>
 
@@ -49,12 +49,22 @@ Resources:
           Statement:
             - Effect: "Allow"
               Action: "secretsmanager:GetSecretValue"
-              Resource: !Ref NRPersonalLicenseKeySecret
+              Resource: !Ref NRLicenseKey
 
-  NRPersonalLicenseKeySecret:
+  # NRPersonalLicenseKeySecret:
+  #   Type: AWS::SecretsManager::Secret
+  #   Properties:
+  #     Name: NRPersonalLicenseKeySecret
+  #     SecretString: !Sub |
+  #       {
+  #         "LicenseKey": "${NRLiceseKey}"
+  #       }
+
+  # If you want to set up NRLiceseKey which 
+  NRLicenseKey:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: NRPersonalLicenseKeySecret
+      Name: NEW_RELIC_LICENSE_KEY
       SecretString: !Sub |
         {
           "LicenseKey": "${NRLiceseKey}"
@@ -63,7 +73,10 @@ Resources:
 Outputs:
   SecretArn:
     Description: "ARN of the LicenseKey secret"
-    Value: !Ref NRPersonalLicenseKeySecret
+    # Value if you want to use default Secrets Manager NRLicenseKey 
+    Value: !Ref NRLicenseKey
+    # Value if you want to use personal Secrets Manager
+    # Value: !Ref NRPersonalLicenseKeySecret
   HelloWorldFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn

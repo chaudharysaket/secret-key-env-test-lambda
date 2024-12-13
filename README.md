@@ -4,7 +4,7 @@ The base code template was created using `sam init` and selecting basic hello wo
 
 ```bash
 sam build
-sam deploy --guided --parameter-overrides NRAccountId=<NRAccountId NRLiceseKey=<NRIngestKey>
+sam deploy --guided --parameter-overrides NRAccountId=<NRAccountId> NRLiceseKey=<NRIngestKey>
 ```
 
 Delete resources after testing
